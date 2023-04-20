@@ -25,6 +25,6 @@ public class BoardController {
 		BWriteCommand command = new BWriteCommand();
 		command.execute(model);
 		
-		return "";
+		return "redirect:list";
 	}
 }
