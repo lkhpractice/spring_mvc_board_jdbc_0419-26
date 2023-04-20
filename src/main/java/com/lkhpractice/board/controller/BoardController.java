@@ -6,6 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.lkhpractice.board.command.BListCommand;
 import com.lkhpractice.board.command.BWriteCommand;
 
 @Controller
@@ -26,5 +27,14 @@ public class BoardController {
 		command.execute(model);
 		
 		return "redirect:list";
+	}
+	
+	@RequestMapping(value = "/list")
+	public String list(Model model) {
+		
+		BListCommand command = new BListCommand();
+		command.execute(model);
+		
+		return "list";
 	}
 }
