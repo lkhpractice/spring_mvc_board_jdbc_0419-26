@@ -67,7 +67,7 @@ public class BDao {
 		
 		ArrayList<BDto> dtos = new ArrayList<BDto>();
 		
-		String sql = "SELECT * FROM mvc_board ORDER BY bid DESC";
+		String sql = "SELECT * FROM mvc_board ORDER BY bgroup DESC, bstep ASC";
 		
 		try {
 			conn = dataSource.getConnection();
