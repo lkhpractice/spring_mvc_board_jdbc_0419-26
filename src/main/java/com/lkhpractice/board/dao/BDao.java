@@ -60,6 +60,7 @@ public class BDao {
 	}
 	
 	public ArrayList<BDto> list() {
+		
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -109,6 +110,58 @@ public class BDao {
 			}
 		}
 		return dtos;
+	}
+	
+	public BDto content_view(String boardId) {
+		
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		BDto dto = null;
+		
+		String sql = "SELECT * FROM mvc_board WHERE bid=?";
+		
+		try {
+			conn = dataSource.getConnection();
+			
+			//DB에서 모든 데이터를 bid의 내림차순으로 정렬 후 가져옴
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, boardId);
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) { //DB에서 가져온 레코드의 수만큼 반복
+				int bid = rs.getInt("bid");
+				String bname = rs.getString("bname");
+				String btitle = rs.getString("btitle");
+				String bcontent = rs.getString("bcontent");
+				Timestamp bdate = rs.getTimestamp("bdate");
+				int bhit = rs.getInt("bhit");
+				int bgroup = rs.getInt("bgroup");
+				int bstep = rs.getInt("bstep");
+				int bindent = rs.getInt("bindent");
+				
+				dto = new BDto(bid, bname, btitle, bcontent, bdate, bhit, bgroup, bstep, bindent);
+			} 
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if(rs != null) {
+					rs.close();
+				}
+				if(pstmt != null) {
+					pstmt.close();
+				}
+				if(conn != null) {
+					conn.close();
+				} 
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return dto;
 	}
 
 }
