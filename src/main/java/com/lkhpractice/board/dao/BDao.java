@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 
 import com.lkhpractice.board.constant.Constant;
 import com.lkhpractice.board.dto.BDto;
@@ -205,169 +206,228 @@ public class BDao {
 		return dto;
 	}
 	
-	public void modify(String bname, String btitle, String bcontent, String bid) {
+	public void modify(final String bname, final String btitle, final String bcontent, final String bid) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+		String sql = "UPDATE mvc_board SET bname=?, btitle=?, bcontent=? WHERE bid=?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "UPDATE mvc_board SET bname=?, btitle=?, bcontent=? WHERE bid=?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, bname);
-			pstmt.setString(2, btitle);
-			pstmt.setString(3, bcontent);
-			pstmt.setString(4, bid);
-			
-			pstmt.executeUpdate();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				pstmt.setString(1, bname);
+				pstmt.setString(2, btitle);
+				pstmt.setString(3, bcontent);
+				pstmt.setString(4, bid);
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "UPDATE mvc_board SET bname=?, btitle=?, bcontent=? WHERE bid=?";
+//			
+//			pstmt = conn.prepareStatement(sql);
+//			pstmt.setString(1, bname);
+//			pstmt.setString(2, btitle);
+//			pstmt.setString(3, bcontent);
+//			pstmt.setString(4, bid);
+//			
+//			pstmt.executeUpdate();
+//			
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 	
-	public void delete(String bid) {
+	public void delete(final String bid) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+		String sql = "DELETE FROM mvc_board WHERE bid=?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "DELETE FROM mvc_board WHERE bid=?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1, bid);
-			
-			pstmt.executeUpdate();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				pstmt.setString(1, bid);
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "DELETE FROM mvc_board WHERE bid=?";
+//			
+//			pstmt = conn.prepareStatement(sql);
+//			
+//			pstmt.setString(1, bid);
+//			
+//			pstmt.executeUpdate();
+//			
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 	
 	}
 	
-	public void upHit(String bid) { //호출 시 조회수(bHit)를 1씩 증가
+	public void upHit(final String bid) { //호출 시 조회수(bHit)를 1씩 증가
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+		String sql = "UPDATE mvc_board SET bhit=bhit+1 WHERE bid=?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "UPDATE mvc_board SET bhit=bhit+1 WHERE bid=?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1, bid);
-			
-			pstmt.executeUpdate();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				pstmt.setString(1, bid);
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "UPDATE mvc_board SET bhit=bhit+1 WHERE bid=?";
+//			
+//			pstmt = conn.prepareStatement(sql);
+//			
+//			pstmt.setString(1, bid);
+//			
+//			pstmt.executeUpdate();
+//			
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 	
-	public void reply(String bid, String bname, String btitle, String bcontent, String bgroup, String bstep, String bindent) {
+	public void reply(final String bid, final String bname, final String btitle, final String bcontent, final String bgroup, final String bstep, final String bindent) {
 		
 		replySort(bgroup, bstep);
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+		String sql = "INSERT INTO mvc_board (bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (mvc_board_seq.nextval, ?, ?, ?, 0, ?, ?, ?)";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "INSERT INTO mvc_board (bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (mvc_board_seq.nextval, ?, ?, ?, 0, ?, ?, ?)";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, bname);
-			pstmt.setString(2, btitle);
-			pstmt.setString(3, bcontent);
-			pstmt.setString(4, bgroup);
-			pstmt.setInt(5, Integer.parseInt(bstep)+1);
-			pstmt.setInt(6, Integer.parseInt(bindent)+1);
-			
-			pstmt.executeUpdate();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				pstmt.setString(1, bname);
+				pstmt.setString(2, btitle);
+				pstmt.setString(3, bcontent);
+				pstmt.setString(4, bgroup);
+				pstmt.setInt(5, Integer.parseInt(bstep)+1);
+				pstmt.setInt(6, Integer.parseInt(bindent)+1);
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "INSERT INTO mvc_board (bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (mvc_board_seq.nextval, ?, ?, ?, 0, ?, ?, ?)";
+//			
+//			pstmt = conn.prepareStatement(sql);
+//			pstmt.setString(1, bname);
+//			pstmt.setString(2, btitle);
+//			pstmt.setString(3, bcontent);
+//			pstmt.setString(4, bgroup);
+//			pstmt.setInt(5, Integer.parseInt(bstep)+1);
+//			pstmt.setInt(6, Integer.parseInt(bindent)+1);
+//			
+//			pstmt.executeUpdate();
+//			
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 	
-	public void replySort(String bgroup, String bstep) {
+	public void replySort(final String bgroup, final String bstep) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
+		String sql = "UPDATE mvc_board SET bstep=bstep+1 WHERE bgroup = ? and bstep > ?";
 		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "UPDATE mvc_board SET bstep=bstep+1 WHERE bgroup = ? and bstep > ?";
+		this.template.update(sql, new PreparedStatementSetter() {
 			
-			pstmt = conn.prepareStatement(sql);
-			
-			pstmt.setString(1, bgroup);
-			pstmt.setString(2, bstep);
-			
-			pstmt.executeUpdate();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
+			@Override
+			public void setValues(PreparedStatement pstmt) throws SQLException {
+				pstmt.setString(1, bgroup);
+				pstmt.setString(2, bstep);
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "UPDATE mvc_board SET bstep=bstep+1 WHERE bgroup = ? and bstep > ?";
+//			
+//			pstmt = conn.prepareStatement(sql);
+//			
+//			pstmt.setString(1, bgroup);
+//			pstmt.setString(2, bstep);
+//			
+//			pstmt.executeUpdate();
+//			
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 	}
 
 }
