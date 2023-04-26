@@ -21,7 +21,7 @@ public class BoardController {
 	
 	private JdbcTemplate template;
 	
-	@Autowired
+	@Autowired // 자동 의존주입 설정
 	public void setTemplate(JdbcTemplate template) {
 		this.template = template;
 		Constant.template = this.template;
