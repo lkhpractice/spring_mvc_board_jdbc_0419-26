@@ -3,6 +3,7 @@ package com.lkhpractice.board.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 
@@ -10,105 +11,137 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.DataSource;
 
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+
+import com.lkhpractice.board.constant.Constant;
 import com.lkhpractice.board.dto.BDto;
 
 public class BDao {
 	
-	DataSource dataSource;
+//	DataSource dataSource; //server context.xml 안에서 가져옴
+	JdbcTemplate  template;
 
 	public BDao() {
 		super();
 		
-		try {
-			Context context = new InitialContext();
-			dataSource = (DataSource) context.lookup("java:comp/env/jdbc/Oracle11g");	
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+		this.template = Constant.template;
+		
+//		try {
+//			Context context = new InitialContext();
+//			dataSource = (DataSource) context.lookup("java:comp/env/jdbc/Oracle11g");	
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 	
-	public void write(String bname, String btitle, String bcontent) {
+	public void write(final String bname, final String btitle, final String bcontent) {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		
-		try {
-			conn = dataSource.getConnection();
-			String sql = "INSERT INTO mvc_board (bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (mvc_board_seq.nextval, ?, ?, ?, 0, mvc_board_seq.currval, 0, 0)";
+		this.template.update(new PreparedStatementCreator() {
 			
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, bname);
-			pstmt.setString(2, btitle);
-			pstmt.setString(3, bcontent);
-			
-			pstmt.executeUpdate();
-			
-		} catch(Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
+			@Override
+			public PreparedStatement createPreparedStatement(Connection conn) throws SQLException {
+				
+				String sql = "INSERT INTO mvc_board (bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (mvc_board_seq.nextval, ?, ?, ?, 0, mvc_board_seq.currval, 0, 0)";
+				
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, bname);
+				pstmt.setString(2, btitle);
+				pstmt.setString(3, bcontent);
+				
+				return pstmt;
 			}
-		}
+		});
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			String sql = "INSERT INTO mvc_board (bid, bname, btitle, bcontent, bhit, bgroup, bstep, bindent) VALUES (mvc_board_seq.nextval, ?, ?, ?, 0, mvc_board_seq.currval, 0, 0)";
+//			
+//			pstmt = conn.prepareStatement(sql);
+//			pstmt.setString(1, bname);
+//			pstmt.setString(2, btitle);
+//			pstmt.setString(3, bcontent);
+//			
+//			pstmt.executeUpdate();
+//			
+//		} catch(Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
+		
 	}
 	
 	public ArrayList<BDto> list() {
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		
-		ArrayList<BDto> dtos = new ArrayList<BDto>();
-		
 		String sql = "SELECT * FROM mvc_board ORDER BY bgroup DESC, bstep ASC";
 		
-		try {
-			conn = dataSource.getConnection();
-			
-			//DB에서 모든 데이터를 bid의 내림차순으로 정렬 후 가져옴
-			pstmt = conn.prepareStatement(sql);
-			rs = pstmt.executeQuery();
-			
-			while(rs.next()) { //DB에서 가져온 레코드의 수만큼 반복
-				int bid = rs.getInt("bid");
-				String bname = rs.getString("bname");
-				String btitle = rs.getString("btitle");
-				String bcontent = rs.getString("bcontent");
-				Timestamp bdate = rs.getTimestamp("bdate");
-				int bhit = rs.getInt("bhit");
-				int bgroup = rs.getInt("bgroup");
-				int bstep = rs.getInt("bstep");
-				int bindent = rs.getInt("bindent");
-				
-				BDto dto = new BDto(bid, bname, btitle, bcontent, bdate, bhit, bgroup, bstep, bindent);
-				
-				dtos.add(dto);
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(rs != null) {
-					rs.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
+		ArrayList<BDto> dtos = (ArrayList<BDto>)this.template.query(sql, new BeanPropertyRowMapper(BDto.class));
+		// DB에서 sql문의 결과를 모두 가져옴 (ArrayList 형태로)
+		
+		
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		
+//		ArrayList<BDto> dtos = new ArrayList<BDto>();
+//		
+//		String sql = "SELECT * FROM mvc_board ORDER BY bgroup DESC, bstep ASC";
+//			String sql = "SELECT * FROM mvc_board ORDER BY bgroup DESC";
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			
+//			//DB에서 모든 데이터를 bid의 내림차순으로 정렬 후 가져옴
+//			pstmt = conn.prepareStatement(sql);
+//			rs = pstmt.executeQuery();
+//			
+//			while(rs.next()) { //DB에서 가져온 레코드의 수만큼 반복
+//				int bid = rs.getInt("bid");
+//				String bname = rs.getString("bname");
+//				String btitle = rs.getString("btitle");
+//				String bcontent = rs.getString("bcontent");
+//				Timestamp bdate = rs.getTimestamp("bdate");
+//				int bhit = rs.getInt("bhit");
+//				int bgroup = rs.getInt("bgroup");
+//				int bstep = rs.getInt("bstep");
+//				int bindent = rs.getInt("bindent");
+//				
+//				BDto dto = new BDto(bid, bname, btitle, bcontent, bdate, bhit, bgroup, bstep, bindent);
+//				
+//				dtos.add(dto);
+//			}
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(rs != null) {
+//					rs.close();
+//				}
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 		return dtos;
 	}
 	
@@ -116,53 +149,59 @@ public class BDao {
 		
 		upHit(boardId); //조회수 증가 메서드 호출
 		
-		Connection conn = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
+		String sql = "SELECT * FROM mvc_board WHERE bid=" + boardId;
 		
-		BDto dto = null;
+		BDto dto = this.template.queryForObject(sql, new BeanPropertyRowMapper(BDto.class));
+		// DB에서 dto 형태로 레코드 1개 가져오기
 		
-		String sql = "SELECT * FROM mvc_board WHERE bid=?";
 		
-		try {
-			conn = dataSource.getConnection();
-			
-			//DB에서 모든 데이터를 bid의 내림차순으로 정렬 후 가져옴
-			pstmt = conn.prepareStatement(sql);
-			pstmt.setString(1, boardId);
-			rs = pstmt.executeQuery();
-			
-			while(rs.next()) { //DB에서 가져온 레코드의 수만큼 반복
-				int bid = rs.getInt("bid");
-				String bname = rs.getString("bname");
-				String btitle = rs.getString("btitle");
-				String bcontent = rs.getString("bcontent");
-				Timestamp bdate = rs.getTimestamp("bdate");
-				int bhit = rs.getInt("bhit");
-				int bgroup = rs.getInt("bgroup");
-				int bstep = rs.getInt("bstep");
-				int bindent = rs.getInt("bindent");
-				
-				dto = new BDto(bid, bname, btitle, bcontent, bdate, bhit, bgroup, bstep, bindent);
-			} 
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if(rs != null) {
-					rs.close();
-				}
-				if(pstmt != null) {
-					pstmt.close();
-				}
-				if(conn != null) {
-					conn.close();
-				} 
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
+//		Connection conn = null;
+//		PreparedStatement pstmt = null;
+//		ResultSet rs = null;
+//		
+//		BDto dto = null;
+//		
+//		String sql = "SELECT * FROM mvc_board WHERE bid=?";
+//		
+//		try {
+//			conn = dataSource.getConnection();
+//			
+//			//DB에서 모든 데이터를 bid의 내림차순으로 정렬 후 가져옴
+//			pstmt = conn.prepareStatement(sql);
+//			pstmt.setString(1, boardId);
+//			rs = pstmt.executeQuery();
+//			
+//			while(rs.next()) { //DB에서 가져온 레코드의 수만큼 반복
+//				int bid = rs.getInt("bid");
+//				String bname = rs.getString("bname");
+//				String btitle = rs.getString("btitle");
+//				String bcontent = rs.getString("bcontent");
+//				Timestamp bdate = rs.getTimestamp("bdate");
+//				int bhit = rs.getInt("bhit");
+//				int bgroup = rs.getInt("bgroup");
+//				int bstep = rs.getInt("bstep");
+//				int bindent = rs.getInt("bindent");
+//				
+//				dto = new BDto(bid, bname, btitle, bcontent, bdate, bhit, bgroup, bstep, bindent);
+//			} 
+//			
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		} finally {
+//			try {
+//				if(rs != null) {
+//					rs.close();
+//				}
+//				if(pstmt != null) {
+//					pstmt.close();
+//				}
+//				if(conn != null) {
+//					conn.close();
+//				} 
+//			} catch(Exception e) {
+//				e.printStackTrace();
+//			}
+//		}
 		return dto;
 	}
 	

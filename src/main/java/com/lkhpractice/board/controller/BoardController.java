@@ -2,6 +2,8 @@ package com.lkhpractice.board.controller;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +14,18 @@ import com.lkhpractice.board.command.BListCommand;
 import com.lkhpractice.board.command.BModifyCommand;
 import com.lkhpractice.board.command.BReplyCommand;
 import com.lkhpractice.board.command.BWriteCommand;
+import com.lkhpractice.board.constant.Constant;
 
 @Controller
 public class BoardController {
+	
+	private JdbcTemplate template;
+	
+	@Autowired
+	public void setTemplate(JdbcTemplate template) {
+		this.template = template;
+		Constant.template = this.template;
+	}
 	
 	@RequestMapping(value = "/")
 	public String index() {
